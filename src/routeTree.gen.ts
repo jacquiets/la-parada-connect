@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,6 +22,11 @@ import { Route as AppEstibajePagosRouteImport } from './routes/_app.estibaje.pag
 import { Route as AppEstibajeOrdenesRouteImport } from './routes/_app.estibaje.ordenes'
 import { Route as AppEstibajeBilleteraRouteImport } from './routes/_app.estibaje.billetera'
 
+const UnauthorizedRoute = UnauthorizedRouteImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -81,6 +87,7 @@ const AppEstibajeBilleteraRoute = AppEstibajeBilleteraRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/dashboard': typeof AppDashboardRoute
   '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/dashboard': typeof AppDashboardRoute
   '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/_app/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/unauthorized'
     | '/dashboard'
     | '/estibaje/billetera'
     | '/estibaje/ordenes'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/unauthorized'
     | '/dashboard'
     | '/estibaje/billetera'
     | '/estibaje/ordenes'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/auth'
+    | '/unauthorized'
     | '/_app/dashboard'
     | '/_app/estibaje/billetera'
     | '/_app/estibaje/ordenes'
@@ -160,10 +172,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -272,6 +292,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  UnauthorizedRoute: UnauthorizedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

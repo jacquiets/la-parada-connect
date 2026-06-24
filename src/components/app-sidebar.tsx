@@ -23,37 +23,63 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { getUser } from "@/lib/auth";
 
-const groups = [
+type MenuItem = {
+  title: string;
+  url: string;
+  icon: any;
+  roles?: string[]; // Si no se especifica, todos pueden verlo
+};
+
+type MenuGroup = {
+  label: string;
+  items: MenuItem[];
+};
+
+const allGroups: MenuGroup[] = [
   {
     label: "General",
     items: [{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard }],
   },
   {
     label: "Módulo de Formalización",
-    items: [{ title: "Validar Perfiles", url: "/formalizacion/perfiles", icon: UserCheck }],
+    items: [
+      { title: "Validar Perfiles", url: "/formalizacion/perfiles", icon: UserCheck, roles: ["Administrador"] },
+    ],
   },
   {
     label: "Módulo de Logística",
     items: [
-      { title: "Programar Ingreso de Camión", url: "/logistica/camiones", icon: Truck },
-      { title: "Inspecciones de Salubridad", url: "/logistica/inspecciones", icon: ClipboardList },
+      { title: "Programar Ingreso de Camión", url: "/logistica/camiones", icon: Truck, roles: ["Comerciante", "Administrador"] },
+      { title: "Inspecciones de Salubridad", url: "/logistica/inspecciones", icon: ClipboardList, roles: ["Administrador"] },
     ],
   },
   {
     label: "Módulo de Estibaje Seguro",
     items: [
-      { title: "Solicitar Servicio de Estibaje", url: "/estibaje/solicitar", icon: PackagePlus },
-      { title: "Órdenes de Trabajo", url: "/estibaje/ordenes", icon: Briefcase },
-      { title: "Pagos Formales", url: "/estibaje/pagos", icon: CreditCard },
-      { title: "Billetera Virtual", url: "/estibaje/billetera", icon: Wallet },
+      { title: "Solicitar Servicio de Estibaje", url: "/estibaje/solicitar", icon: PackagePlus, roles: ["Comerciante", "Administrador"] },
+      { title: "Órdenes de Trabajo", url: "/estibaje/ordenes", icon: Briefcase, roles: ["Comerciante", "Estibador", "Administrador"] },
+      { title: "Pagos Formales", url: "/estibaje/pagos", icon: CreditCard, roles: ["Comerciante", "Administrador"] },
+      { title: "Billetera Virtual", url: "/estibaje/billetera", icon: Wallet, roles: ["Estibador"] },
     ],
   },
-] as const;
+];
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (url: string) => pathname === url;
+  
+  const user = getUser();
+  const userRole = user?.rol_nombre || "";
+
+  // Filtrar grupos y items basados en el rol
+  const filteredGroups = allGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.roles || item.roles.includes(userRole)),
+    }))
+    .filter((group) => group.items.length > 0); // No mostrar grupos vacíos
 
   return (
     <Sidebar collapsible="icon">
@@ -72,7 +98,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {groups.map((group) => (
+        {filteredGroups.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase">
               {group.label}
