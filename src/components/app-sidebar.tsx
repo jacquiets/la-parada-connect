@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Truck,
   UserCheck,
@@ -58,8 +58,8 @@ const allGroups: MenuGroup[] = [
   {
     label: "Módulo de Estibaje Seguro",
     items: [
-      { title: "Solicitar Servicio de Estibaje", url: "/estibaje/solicitar", icon: PackagePlus, roles: ["Comerciante", "Administrador"] },
-      { title: "Órdenes de Trabajo", url: "/estibaje/ordenes", icon: Briefcase, roles: ["Comerciante", "Estibador", "Administrador"] },
+      { title: "Consultar solicitudes de estibaje", url: "/estibaje/solicitudes", icon: PackagePlus, roles: ["Comerciante", "Administrador"] },
+      { title: "Órdenes de Trabajo", url: "/estibaje/ordenes", icon: Briefcase, roles: ["Estibador", "Administrador"] },
       { title: "Pagos Formales", url: "/estibaje/pagos", icon: CreditCard, roles: ["Comerciante", "Administrador"] },
       { title: "Billetera Virtual", url: "/estibaje/billetera", icon: Wallet, roles: ["Estibador"] },
     ],
@@ -68,10 +68,17 @@ const allGroups: MenuGroup[] = [
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const isActive = (url: string) => pathname === url;
   
   const user = getUser();
   const userRole = user?.rol_nombre || "";
+
+  const handleLogout = () => {
+    localStorage.removeItem("la_parada_token");
+    localStorage.removeItem("la_parada_user");
+    navigate({ to: "/auth" });
+  };
 
   // Filtrar grupos y items basados en el rol
   const filteredGroups = allGroups
@@ -124,11 +131,11 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Cerrar sesión">
-              <Link to="/auth" className="flex items-center gap-2">
+            <SidebarMenuButton tooltip="Cerrar sesión" onClick={handleLogout} className="cursor-pointer">
+              <div className="flex items-center gap-2">
                 <LogOut className="h-4 w-4" />
                 <span>Cerrar sesión</span>
-              </Link>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
