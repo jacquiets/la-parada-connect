@@ -1,0 +1,183 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  Truck,
+  Briefcase,
+  Wallet,
+  ArrowUpRight,
+  TrendingUp,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+export const Route = createFileRoute("/_app/dashboard")({
+  head: () => ({
+    meta: [{ title: "Dashboard — La Parada" }],
+  }),
+  component: DashboardPage,
+});
+
+const metrics = [
+  {
+    title: "Camiones Programados hoy",
+    value: "12",
+    change: "+2 vs. ayer",
+    icon: Truck,
+    trend: "up",
+  },
+  {
+    title: "Órdenes de Trabajo Pendientes",
+    value: "7",
+    change: "3 esperando aceptación",
+    icon: Briefcase,
+    trend: "neutral",
+  },
+  {
+    title: "Saldo en Billetera",
+    value: "S/ 4,820.50",
+    change: "+S/ 350 esta semana",
+    icon: Wallet,
+    trend: "up",
+  },
+] as const;
+
+const recentOrders = [
+  { id: "OT-1042", origen: "Mayorista San Luis", estado: "En curso", color: "bg-blue-100 text-blue-700" },
+  { id: "OT-1041", origen: "Distribuidora Norte", estado: "Pendiente", color: "bg-amber-100 text-amber-700" },
+  { id: "OT-1040", origen: "Frutas del Valle", estado: "Completada", color: "bg-emerald-100 text-emerald-700" },
+  { id: "OT-1039", origen: "Agro Lima SAC", estado: "Completada", color: "bg-emerald-100 text-emerald-700" },
+];
+
+function DashboardPage() {
+  return (
+    <div className="space-y-6 md:space-y-8">
+      {/* Welcome */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Bienvenido de vuelta,</p>
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">
+            Juan Pérez
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Aquí tienes un resumen de tu operación logística de hoy.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            Programar camión
+          </Button>
+          <Button asChild className="shadow-sm">
+            <Link to="/estibaje/solicitar">
+              Solicitar estibaje
+              <ArrowUpRight className="h-4 w-4 ml-1" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Metrics */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {metrics.map((m) => (
+          <Card key={m.title} className="shadow-sm border-border/70">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {m.title}
+              </CardTitle>
+              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <m.icon className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-semibold text-foreground">{m.value}</div>
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                {m.trend === "up" && <TrendingUp className="h-3 w-3 text-emerald-600" />}
+                {m.change}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Two-column */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card className="shadow-sm border-border/70 lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Órdenes recientes</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                Últimas órdenes de trabajo registradas en el sistema.
+              </p>
+            </div>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/estibaje/ordenes">Ver todo</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {recentOrders.map((o) => (
+              <div
+                key={o.id}
+                className="flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-md bg-muted flex items-center justify-center">
+                    <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{o.id}</p>
+                    <p className="text-xs text-muted-foreground">{o.origen}</p>
+                  </div>
+                </div>
+                <Badge variant="secondary" className={`${o.color} border-0 font-medium`}>
+                  {o.estado}
+                </Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-border/70">
+          <CardHeader>
+            <CardTitle className="text-base">Próximas tareas</CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">
+              Lo que necesita tu atención.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <TaskItem
+              icon={<Clock className="h-4 w-4 text-amber-600" />}
+              title="Inspección de salubridad"
+              meta="Camión TR-204 · 10:30 AM"
+            />
+            <TaskItem
+              icon={<CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+              title="Confirmar OT-1041"
+              meta="Estibador asignado"
+            />
+            <TaskItem
+              icon={<Wallet className="h-4 w-4 text-primary" />}
+              title="Pago formal pendiente"
+              meta="S/ 320.00 · OT-1038"
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function TaskItem({ icon, title, meta }: { icon: React.ReactNode; title: string; meta: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-border/70 p-3">
+      <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-foreground">{title}</p>
+        <p className="text-xs text-muted-foreground">{meta}</p>
+      </div>
+    </div>
+  );
+}

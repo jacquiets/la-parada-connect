@@ -9,38 +9,175 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppLogisticaInspeccionesRouteImport } from './routes/_app.logistica.inspecciones'
+import { Route as AppLogisticaCamionesRouteImport } from './routes/_app.logistica.camiones'
+import { Route as AppFormalizacionPerfilesRouteImport } from './routes/_app.formalizacion.perfiles'
+import { Route as AppEstibajeSolicitarRouteImport } from './routes/_app.estibaje.solicitar'
+import { Route as AppEstibajePagosRouteImport } from './routes/_app.estibaje.pagos'
+import { Route as AppEstibajeOrdenesRouteImport } from './routes/_app.estibaje.ordenes'
+import { Route as AppEstibajeBilleteraRouteImport } from './routes/_app.estibaje.billetera'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLogisticaInspeccionesRoute =
+  AppLogisticaInspeccionesRouteImport.update({
+    id: '/logistica/inspecciones',
+    path: '/logistica/inspecciones',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppLogisticaCamionesRoute = AppLogisticaCamionesRouteImport.update({
+  id: '/logistica/camiones',
+  path: '/logistica/camiones',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFormalizacionPerfilesRoute =
+  AppFormalizacionPerfilesRouteImport.update({
+    id: '/formalizacion/perfiles',
+    path: '/formalizacion/perfiles',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppEstibajeSolicitarRoute = AppEstibajeSolicitarRouteImport.update({
+  id: '/estibaje/solicitar',
+  path: '/estibaje/solicitar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstibajePagosRoute = AppEstibajePagosRouteImport.update({
+  id: '/estibaje/pagos',
+  path: '/estibaje/pagos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstibajeOrdenesRoute = AppEstibajeOrdenesRouteImport.update({
+  id: '/estibaje/ordenes',
+  path: '/estibaje/ordenes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstibajeBilleteraRoute = AppEstibajeBilleteraRouteImport.update({
+  id: '/estibaje/billetera',
+  path: '/estibaje/billetera',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
+  '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
+  '/estibaje/pagos': typeof AppEstibajePagosRoute
+  '/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
+  '/logistica/camiones': typeof AppLogisticaCamionesRoute
+  '/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
+  '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
+  '/estibaje/pagos': typeof AppEstibajePagosRoute
+  '/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
+  '/logistica/camiones': typeof AppLogisticaCamionesRoute
+  '/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/estibaje/billetera': typeof AppEstibajeBilleteraRoute
+  '/_app/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
+  '/_app/estibaje/pagos': typeof AppEstibajePagosRoute
+  '/_app/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/_app/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
+  '/_app/logistica/camiones': typeof AppLogisticaCamionesRoute
+  '/_app/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/estibaje/billetera'
+    | '/estibaje/ordenes'
+    | '/estibaje/pagos'
+    | '/estibaje/solicitar'
+    | '/formalizacion/perfiles'
+    | '/logistica/camiones'
+    | '/logistica/inspecciones'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/estibaje/billetera'
+    | '/estibaje/ordenes'
+    | '/estibaje/pagos'
+    | '/estibaje/solicitar'
+    | '/formalizacion/perfiles'
+    | '/logistica/camiones'
+    | '/logistica/inspecciones'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/_app/dashboard'
+    | '/_app/estibaje/billetera'
+    | '/_app/estibaje/ordenes'
+    | '/_app/estibaje/pagos'
+    | '/_app/estibaje/solicitar'
+    | '/_app/formalizacion/perfiles'
+    | '/_app/logistica/camiones'
+    | '/_app/logistica/inspecciones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +185,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/logistica/inspecciones': {
+      id: '/_app/logistica/inspecciones'
+      path: '/logistica/inspecciones'
+      fullPath: '/logistica/inspecciones'
+      preLoaderRoute: typeof AppLogisticaInspeccionesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/logistica/camiones': {
+      id: '/_app/logistica/camiones'
+      path: '/logistica/camiones'
+      fullPath: '/logistica/camiones'
+      preLoaderRoute: typeof AppLogisticaCamionesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/formalizacion/perfiles': {
+      id: '/_app/formalizacion/perfiles'
+      path: '/formalizacion/perfiles'
+      fullPath: '/formalizacion/perfiles'
+      preLoaderRoute: typeof AppFormalizacionPerfilesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/estibaje/solicitar': {
+      id: '/_app/estibaje/solicitar'
+      path: '/estibaje/solicitar'
+      fullPath: '/estibaje/solicitar'
+      preLoaderRoute: typeof AppEstibajeSolicitarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/estibaje/pagos': {
+      id: '/_app/estibaje/pagos'
+      path: '/estibaje/pagos'
+      fullPath: '/estibaje/pagos'
+      preLoaderRoute: typeof AppEstibajePagosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/estibaje/ordenes': {
+      id: '/_app/estibaje/ordenes'
+      path: '/estibaje/ordenes'
+      fullPath: '/estibaje/ordenes'
+      preLoaderRoute: typeof AppEstibajeOrdenesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/estibaje/billetera': {
+      id: '/_app/estibaje/billetera'
+      path: '/estibaje/billetera'
+      fullPath: '/estibaje/billetera'
+      preLoaderRoute: typeof AppEstibajeBilleteraRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppEstibajeBilleteraRoute: typeof AppEstibajeBilleteraRoute
+  AppEstibajeOrdenesRoute: typeof AppEstibajeOrdenesRoute
+  AppEstibajePagosRoute: typeof AppEstibajePagosRoute
+  AppEstibajeSolicitarRoute: typeof AppEstibajeSolicitarRoute
+  AppFormalizacionPerfilesRoute: typeof AppFormalizacionPerfilesRoute
+  AppLogisticaCamionesRoute: typeof AppLogisticaCamionesRoute
+  AppLogisticaInspeccionesRoute: typeof AppLogisticaInspeccionesRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppEstibajeBilleteraRoute: AppEstibajeBilleteraRoute,
+  AppEstibajeOrdenesRoute: AppEstibajeOrdenesRoute,
+  AppEstibajePagosRoute: AppEstibajePagosRoute,
+  AppEstibajeSolicitarRoute: AppEstibajeSolicitarRoute,
+  AppFormalizacionPerfilesRoute: AppFormalizacionPerfilesRoute,
+  AppLogisticaCamionesRoute: AppLogisticaCamionesRoute,
+  AppLogisticaInspeccionesRoute: AppLogisticaInspeccionesRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
