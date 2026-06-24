@@ -1,6 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { Truck, ShieldCheck, PackageCheck } from "lucide-react";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Truck, ShieldCheck, PackageCheck, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +18,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PasswordStrength } from "@/components/PasswordStrength";
+
+import { authRegister, authLogin, ApiError } from "@/lib/api";
+import { saveToken, saveUser } from "@/lib/auth";
+
+// ─── Schemas ──────────────────────────────────────────────────────────────────
+
+const registerSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido").max(50, "Máximo 50 caracteres"),
+  lastname: z.string().min(1, "El apellido es requerido").max(50, "Máximo 50 caracteres"),
+  email: z.string().email("Correo electrónico inválido").max(100, "Máximo 100 caracteres"),
+  password: z
+    .string()
+    .min(8, "Mínimo 8 caracteres")
+    .max(64, "Máximo 64 caracteres")
+    .regex(/[A-Z]/, "Debe contener una mayúscula")
+    .regex(/[a-z]/, "Debe contener una minúscula")
+    .regex(/[0-9]/, "Debe contener un número")
+    .regex(/[^A-Za-z0-9]/, "Debe contener un símbolo"),
+  role: z.enum(["comerciante", "estibador"]),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Correo electrónico inválido"),
+  password: z.string().min(1, "La contraseña es requerida"),
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+// ─── Route ────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -24,13 +60,87 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 function AuthPage() {
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    navigate({ to: "/dashboard" });
+  // ── Login form ──────────────────────────────────────────────────────────────
+  const {
+    register: registerLogin,
+    handleSubmit: handleLoginSubmit,
+    formState: { errors: loginErrors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFormValues) => authLogin({ email: data.email, password: data.password }),
+    onSuccess: (res) => {
+      saveToken(res.access_token);
+      saveUser(res.user);
+      toast.success("¡Bienvenido de vuelta!");
+      navigate({ to: "/dashboard" });
+    },
+    onError: (err) => {
+      if (err instanceof ApiError) {
+        toast.error(`Error: ${err.message}`);
+      } else {
+        toast.error("Error de conexión al servidor.");
+      }
+    },
+  });
+
+  const onLogin = (data: LoginFormValues) => {
+    loginMutation.mutate(data);
   };
+
+  // ── Register form ───────────────────────────────────────────────────────────
+  const {
+    register,
+    handleSubmit: handleRegisterSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      role: "comerciante",
+    },
+    mode: "onChange",
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: (data: RegisterFormValues) =>
+      authRegister({
+        nombres: data.name,
+        apellidos: data.lastname,
+        email: data.email,
+        password: data.password,
+        rol_nombre: data.role,
+      }),
+    onSuccess: (res) => {
+      saveToken(res.access_token);
+      saveUser(res.user);
+      toast.success("¡Cuenta creada exitosamente!");
+      navigate({ to: "/dashboard" });
+    },
+    onError: (err) => {
+      if (err instanceof ApiError) {
+        toast.error(`Error: ${err.message}`);
+      } else {
+        toast.error("Error de conexión al servidor.");
+      }
+    },
+  });
+
+  const onRegister = (data: RegisterFormValues) => {
+    registerMutation.mutate(data);
+  };
+
+  const currentPassword = watch("password");
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2 bg-background">
@@ -95,50 +205,92 @@ function AuthPage() {
               <TabsTrigger value="register">Registrarse</TabsTrigger>
             </TabsList>
 
+            {/* ── Login ── */}
             <TabsContent value="login" className="mt-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleLoginSubmit(onLogin)} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Correo</Label>
-                  <Input id="login-email" type="email" placeholder="tu@correo.com" required />
+                  <Input
+                    id="login-email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    maxLength={100}
+                    {...registerLogin("email")}
+                  />
+                  {loginErrors.email && (
+                    <p className="text-xs text-red-500">{loginErrors.email.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Contraseña</Label>
-                  <Input id="login-password" type="password" placeholder="••••••••" required />
+                  <Input
+                    id="login-password"
+                    type="password"
+                    placeholder="••••••••"
+                    maxLength={64}
+                    {...registerLogin("password")}
+                  />
+                  {loginErrors.password && (
+                    <p className="text-xs text-red-500">{loginErrors.password.message}</p>
+                  )}
                 </div>
                 <div className="flex items-center justify-end">
                   <button type="button" className="text-xs text-primary hover:underline">
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
-                <Button type="submit" className="w-full shadow-sm">
-                  Iniciar Sesión
+
+                {/* Error de API */}
+                {loginMutation.isError && (
+                  <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                    {loginMutation.error instanceof ApiError ? loginMutation.error.message : "Error de conexión al servidor."}
+                  </p>
+                )}
+
+                <Button type="submit" className="w-full shadow-sm" disabled={loginMutation.isPending}>
+                  {loginMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Iniciando sesión…
+                    </>
+                  ) : (
+                    "Iniciar Sesión"
+                  )}
                 </Button>
               </form>
             </TabsContent>
 
+            {/* ── Register ── */}
             <TabsContent value="register" className="mt-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleRegisterSubmit(onRegister)} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="reg-name">Nombres</Label>
-                    <Input id="reg-name" placeholder="Juan" required />
+                    <Input id="reg-name" placeholder="Juan" maxLength={50} {...register("name")} />
+                    {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reg-lastname">Apellidos</Label>
-                    <Input id="reg-lastname" placeholder="Pérez" required />
+                    <Input id="reg-lastname" placeholder="Pérez" maxLength={50} {...register("lastname")} />
+                    {errors.lastname && <p className="text-xs text-red-500">{errors.lastname.message}</p>}
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-email">Correo</Label>
-                  <Input id="reg-email" type="email" placeholder="tu@correo.com" required />
+                  <Input id="reg-email" type="email" placeholder="tu@correo.com" maxLength={100} {...register("email")} />
+                  {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-password">Contraseña</Label>
-                  <Input id="reg-password" type="password" placeholder="••••••••" required />
+                  <Input id="reg-password" type="password" placeholder="••••••••" maxLength={64} {...register("password")} />
+                  <PasswordStrength password={currentPassword} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-role">Rol</Label>
-                  <Select defaultValue="comerciante">
+                  <Select
+                    defaultValue="comerciante"
+                    onValueChange={(value) => setValue("role", value as "comerciante" | "estibador")}
+                  >
                     <SelectTrigger id="reg-role">
                       <SelectValue placeholder="Selecciona tu rol" />
                     </SelectTrigger>
@@ -147,9 +299,25 @@ function AuthPage() {
                       <SelectItem value="estibador">Estibador</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.role && <p className="text-xs text-red-500">{errors.role.message}</p>}
                 </div>
-                <Button type="submit" className="w-full shadow-sm">
-                  Crear Cuenta
+
+                {/* Error de API */}
+                {registerMutation.isError && (
+                  <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                    {registerMutation.error instanceof ApiError ? registerMutation.error.message : "Error de conexión al servidor."}
+                  </p>
+                )}
+
+                <Button type="submit" className="w-full shadow-sm" disabled={registerMutation.isPending}>
+                  {registerMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Creando cuenta…
+                    </>
+                  ) : (
+                    "Crear Cuenta"
+                  )}
                 </Button>
               </form>
             </TabsContent>
