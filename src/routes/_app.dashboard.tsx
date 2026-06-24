@@ -135,15 +135,8 @@ function DashboardAdministrador({ user }: { user: any }) {
 function DashboardComerciante({ user }: { user: any }) {
   const metrics = [
     { title: "Camiones Programados hoy", value: "12", change: "+2 vs. ayer", icon: Truck, trend: "up" },
-    { title: "Órdenes de Trabajo Pendientes", value: "7", change: "3 esperando aceptación", icon: Briefcase, trend: "neutral" },
+    { title: "Pagos Formales Pendientes", value: "3", change: "Requiere tu atención", icon: Wallet, trend: "neutral" },
     { title: "Saldo en Billetera", value: "S/ 4,820.50", change: "+S/ 350 esta semana", icon: Wallet, trend: "up" },
-  ];
-
-  const recentOrders = [
-    { id: "OT-1042", origen: "Mayorista San Luis", estado: "En curso", color: "bg-blue-100 text-blue-700" },
-    { id: "OT-1041", origen: "Distribuidora Norte", estado: "Pendiente", color: "bg-amber-100 text-amber-700" },
-    { id: "OT-1040", origen: "Frutas del Valle", estado: "Completada", color: "bg-emerald-100 text-emerald-700" },
-    { id: "OT-1039", origen: "Agro Lima SAC", estado: "Completada", color: "bg-emerald-100 text-emerald-700" },
   ];
 
   return (
@@ -161,7 +154,7 @@ function DashboardComerciante({ user }: { user: any }) {
             <Link to="/logistica/camiones">Programar camión</Link>
           </Button>
           <Button asChild className="shadow-sm">
-            <Link to="/estibaje/solicitar">
+            <Link to="/estibaje/solicitudes">
               Solicitar estibaje
               <ArrowUpRight className="h-4 w-4 ml-1" />
             </Link>
@@ -193,28 +186,27 @@ function DashboardComerciante({ user }: { user: any }) {
         <Card className="shadow-sm border-border/70 lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base">Órdenes recientes</CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Últimas órdenes de trabajo registradas en el sistema.</p>
+              <CardTitle className="text-base">Próximos Camiones</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">Camiones programados para hoy.</p>
             </div>
             <Button asChild variant="ghost" size="sm">
-              <Link to="/estibaje/ordenes">Ver todo</Link>
+              <Link to="/logistica/camiones">Ver todo</Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-1">
-            {recentOrders.map((o) => (
-              <div key={o.id} className="flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-md bg-muted flex items-center justify-center">
-                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{o.id}</p>
-                    <p className="text-xs text-muted-foreground">{o.origen}</p>
-                  </div>
+            {/* Mocked logic for trucks instead of orders */}
+            <div className="flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-md bg-muted flex items-center justify-center">
+                  <Truck className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <Badge variant="secondary" className={`${o.color} border-0 font-medium`}>{o.estado}</Badge>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Placa ABC-123</p>
+                  <p className="text-xs text-muted-foreground">Llegada: 10:30 AM</p>
+                </div>
               </div>
-            ))}
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-0 font-medium">En camino</Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -224,9 +216,7 @@ function DashboardComerciante({ user }: { user: any }) {
             <p className="text-xs text-muted-foreground mt-1">Lo que necesita tu atención.</p>
           </CardHeader>
           <CardContent className="space-y-3">
-            <TaskItem icon={<Clock className="h-4 w-4 text-amber-600" />} title="Inspección de salubridad" meta="Camión TR-204 · 10:30 AM" />
-            <TaskItem icon={<CheckCircle2 className="h-4 w-4 text-emerald-600" />} title="Confirmar OT-1041" meta="Estibador asignado" />
-            <TaskItem icon={<Wallet className="h-4 w-4 text-primary" />} title="Pago formal pendiente" meta="S/ 320.00 · OT-1038" />
+            <TaskItem icon={<Wallet className="h-4 w-4 text-primary" />} title="Pago formal pendiente" meta="S/ 320.00 · Por estibaje" />
           </CardContent>
         </Card>
       </div>

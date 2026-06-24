@@ -17,7 +17,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppLogisticaInspeccionesRouteImport } from './routes/_app.logistica.inspecciones'
 import { Route as AppLogisticaCamionesRouteImport } from './routes/_app.logistica.camiones'
 import { Route as AppFormalizacionPerfilesRouteImport } from './routes/_app.formalizacion.perfiles'
-import { Route as AppEstibajeSolicitarRouteImport } from './routes/_app.estibaje.solicitar'
+import { Route as AppEstibajeSolicitudesRouteImport } from './routes/_app.estibaje.solicitudes'
 import { Route as AppEstibajePagosRouteImport } from './routes/_app.estibaje.pagos'
 import { Route as AppEstibajeOrdenesRouteImport } from './routes/_app.estibaje.ordenes'
 import { Route as AppEstibajeBilleteraRouteImport } from './routes/_app.estibaje.billetera'
@@ -63,9 +63,9 @@ const AppFormalizacionPerfilesRoute =
     path: '/formalizacion/perfiles',
     getParentRoute: () => AppRoute,
   } as any)
-const AppEstibajeSolicitarRoute = AppEstibajeSolicitarRouteImport.update({
-  id: '/estibaje/solicitar',
-  path: '/estibaje/solicitar',
+const AppEstibajeSolicitudesRoute = AppEstibajeSolicitudesRouteImport.update({
+  id: '/estibaje/solicitudes',
+  path: '/estibaje/solicitudes',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEstibajePagosRoute = AppEstibajePagosRouteImport.update({
@@ -92,7 +92,7 @@ export interface FileRoutesByFullPath {
   '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
   '/estibaje/pagos': typeof AppEstibajePagosRoute
-  '/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/estibaje/solicitudes': typeof AppEstibajeSolicitudesRoute
   '/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
   '/logistica/camiones': typeof AppLogisticaCamionesRoute
   '/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
@@ -105,7 +105,7 @@ export interface FileRoutesByTo {
   '/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
   '/estibaje/pagos': typeof AppEstibajePagosRoute
-  '/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/estibaje/solicitudes': typeof AppEstibajeSolicitudesRoute
   '/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
   '/logistica/camiones': typeof AppLogisticaCamionesRoute
   '/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
@@ -120,7 +120,7 @@ export interface FileRoutesById {
   '/_app/estibaje/billetera': typeof AppEstibajeBilleteraRoute
   '/_app/estibaje/ordenes': typeof AppEstibajeOrdenesRoute
   '/_app/estibaje/pagos': typeof AppEstibajePagosRoute
-  '/_app/estibaje/solicitar': typeof AppEstibajeSolicitarRoute
+  '/_app/estibaje/solicitudes': typeof AppEstibajeSolicitudesRoute
   '/_app/formalizacion/perfiles': typeof AppFormalizacionPerfilesRoute
   '/_app/logistica/camiones': typeof AppLogisticaCamionesRoute
   '/_app/logistica/inspecciones': typeof AppLogisticaInspeccionesRoute
@@ -135,7 +135,7 @@ export interface FileRouteTypes {
     | '/estibaje/billetera'
     | '/estibaje/ordenes'
     | '/estibaje/pagos'
-    | '/estibaje/solicitar'
+    | '/estibaje/solicitudes'
     | '/formalizacion/perfiles'
     | '/logistica/camiones'
     | '/logistica/inspecciones'
@@ -148,7 +148,7 @@ export interface FileRouteTypes {
     | '/estibaje/billetera'
     | '/estibaje/ordenes'
     | '/estibaje/pagos'
-    | '/estibaje/solicitar'
+    | '/estibaje/solicitudes'
     | '/formalizacion/perfiles'
     | '/logistica/camiones'
     | '/logistica/inspecciones'
@@ -162,7 +162,7 @@ export interface FileRouteTypes {
     | '/_app/estibaje/billetera'
     | '/_app/estibaje/ordenes'
     | '/_app/estibaje/pagos'
-    | '/_app/estibaje/solicitar'
+    | '/_app/estibaje/solicitudes'
     | '/_app/formalizacion/perfiles'
     | '/_app/logistica/camiones'
     | '/_app/logistica/inspecciones'
@@ -233,11 +233,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFormalizacionPerfilesRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/estibaje/solicitar': {
-      id: '/_app/estibaje/solicitar'
-      path: '/estibaje/solicitar'
-      fullPath: '/estibaje/solicitar'
-      preLoaderRoute: typeof AppEstibajeSolicitarRouteImport
+    '/_app/estibaje/solicitudes': {
+      id: '/_app/estibaje/solicitudes'
+      path: '/estibaje/solicitudes'
+      fullPath: '/estibaje/solicitudes'
+      preLoaderRoute: typeof AppEstibajeSolicitudesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/estibaje/pagos': {
@@ -269,7 +269,7 @@ interface AppRouteChildren {
   AppEstibajeBilleteraRoute: typeof AppEstibajeBilleteraRoute
   AppEstibajeOrdenesRoute: typeof AppEstibajeOrdenesRoute
   AppEstibajePagosRoute: typeof AppEstibajePagosRoute
-  AppEstibajeSolicitarRoute: typeof AppEstibajeSolicitarRoute
+  AppEstibajeSolicitudesRoute: typeof AppEstibajeSolicitudesRoute
   AppFormalizacionPerfilesRoute: typeof AppFormalizacionPerfilesRoute
   AppLogisticaCamionesRoute: typeof AppLogisticaCamionesRoute
   AppLogisticaInspeccionesRoute: typeof AppLogisticaInspeccionesRoute
@@ -280,7 +280,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEstibajeBilleteraRoute: AppEstibajeBilleteraRoute,
   AppEstibajeOrdenesRoute: AppEstibajeOrdenesRoute,
   AppEstibajePagosRoute: AppEstibajePagosRoute,
-  AppEstibajeSolicitarRoute: AppEstibajeSolicitarRoute,
+  AppEstibajeSolicitudesRoute: AppEstibajeSolicitudesRoute,
   AppFormalizacionPerfilesRoute: AppFormalizacionPerfilesRoute,
   AppLogisticaCamionesRoute: AppLogisticaCamionesRoute,
   AppLogisticaInspeccionesRoute: AppLogisticaInspeccionesRoute,
