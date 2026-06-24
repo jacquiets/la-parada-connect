@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getUser } from "@/lib/auth";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -52,6 +53,8 @@ const recentOrders = [
 ];
 
 function DashboardPage() {
+  const user = getUser();
+
   return (
     <div className="space-y-6 md:space-y-8">
       {/* Welcome */}
@@ -59,7 +62,7 @@ function DashboardPage() {
         <div>
           <p className="text-sm text-muted-foreground">Bienvenido de vuelta,</p>
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">
-            Juan Pérez
+            {user ? `${user.nombres} ${user.apellidos}` : "Usuario"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Aquí tienes un resumen de tu operación logística de hoy.
