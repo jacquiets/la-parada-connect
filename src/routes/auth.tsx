@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Truck, ShieldCheck, PackageCheck, Loader2 } from "lucide-react";
+import { Truck, ShieldCheck, PackageCheck, Loader2, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,7 @@ const registerSchema = z.object({
     .regex(/[a-z]/, "Debe contener una minúscula")
     .regex(/[0-9]/, "Debe contener un número")
     .regex(/[^A-Za-z0-9]/, "Debe contener un símbolo"),
-  role: z.enum(["comerciante", "estibador"]),
+  role: z.enum(["Comerciante", "Estibador"]),
 });
 
 const loginSchema = z.object({
@@ -48,9 +48,16 @@ const loginSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+import { isAuthenticated } from "@/lib/auth";
+
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/auth")({
+  beforeLoad: () => {
+    if (isAuthenticated()) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Acceso — La Parada" },
@@ -64,6 +71,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   // ── Login form ──────────────────────────────────────────────────────────────
   const {
@@ -105,7 +114,7 @@ function AuthPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: "comerciante",
+      role: "Comerciante",
     },
     mode: "onChange",
   });
@@ -223,13 +232,23 @@ function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Contraseña</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    maxLength={64}
-                    {...registerLogin("password")}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      maxLength={64}
+                      className="pr-10"
+                      {...registerLogin("password")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   {loginErrors.password && (
                     <p className="text-xs text-red-500">{loginErrors.password.message}</p>
                   )}
@@ -282,21 +301,37 @@ function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-password">Contraseña</Label>
-                  <Input id="reg-password" type="password" placeholder="••••••••" maxLength={64} {...register("password")} />
+                  <div className="relative">
+                    <Input 
+                      id="reg-password" 
+                      type={showRegisterPassword ? "text" : "password"} 
+                      placeholder="••••••••" 
+                      maxLength={64} 
+                      className="pr-10"
+                      {...register("password")} 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showRegisterPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   <PasswordStrength password={currentPassword} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-role">Rol</Label>
                   <Select
-                    defaultValue="comerciante"
-                    onValueChange={(value) => setValue("role", value as "comerciante" | "estibador")}
+                    defaultValue="Comerciante"
+                    onValueChange={(value) => setValue("role", value as "Comerciante" | "Estibador")}
                   >
                     <SelectTrigger id="reg-role">
                       <SelectValue placeholder="Selecciona tu rol" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="comerciante">Comerciante</SelectItem>
-                      <SelectItem value="estibador">Estibador</SelectItem>
+                      <SelectItem value="Comerciante">Comerciante</SelectItem>
+                      <SelectItem value="Estibador">Estibador</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.role && <p className="text-xs text-red-500">{errors.role.message}</p>}

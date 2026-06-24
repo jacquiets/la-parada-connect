@@ -1,5 +1,5 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { Bell, Search } from "lucide-react";
+import { Outlet, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Bell, Search, LogOut } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -8,12 +8,31 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { getUser, isAuthenticated, logout } from "@/lib/auth";
 
 export const Route = createFileRoute("/_app")({
+  beforeLoad: () => {
+    if (!isAuthenticated()) {
+      throw redirect({ to: "/auth" });
+    }
+  },
   component: AppLayout,
 });
 
 function AppLayout() {
+  const navigate = useNavigate();
+  const user = getUser();
+  
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/auth" });
+  };
+
+  // Extraer iniciales (ej. Juan Pérez -> JP)
+  const initials = user
+    ? `${user.nombres.charAt(0)}${user.apellidos.charAt(0)}`.toUpperCase()
+    : "U";
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,14 +59,24 @@ function AppLayout() {
             <div className="flex items-center gap-2 pl-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-[var(--brand-dark)] text-white text-xs font-semibold">
-                  JP
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block leading-tight">
-                <p className="text-sm font-medium text-foreground">Juan Pérez</p>
-                <p className="text-[11px] text-muted-foreground">Comerciante</p>
+                <p className="text-sm font-medium text-foreground">
+                  {user ? `${user.nombres} ${user.apellidos}` : "Usuario"}
+                </p>
+                <p className="text-[11px] text-muted-foreground capitalize">
+                  {user?.rol_nombre || "Invitado"}
+                </p>
               </div>
             </div>
+            
+            <Separator orientation="vertical" className="h-6 ml-2" />
+            
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Cerrar Sesión">
+              <LogOut className="h-4 w-4 text-muted-foreground" />
+            </Button>
           </div>
         </header>
 
