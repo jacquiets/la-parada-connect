@@ -23,7 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { getUser } from "@/lib/auth";
+import { getUser, logout } from "@/lib/auth";
 
 type MenuItem = {
   title: string;
@@ -75,8 +75,7 @@ export function AppSidebar() {
   const userRole = user?.rol_nombre || "";
 
   const handleLogout = () => {
-    localStorage.removeItem("la_parada_token");
-    localStorage.removeItem("la_parada_user");
+    logout();
     navigate({ to: "/auth" });
   };
 
